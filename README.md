@@ -17,7 +17,7 @@ La API maneja series, personajes, episodios, ratings, subida de imagenes y expor
 1. Clonar este repositorio:
 
 ```bash
-git clone URL_DEL_REPOSITORIO_BACKEND
+git clone https://github.com/EmilioChenf/ChenToons-backend
 cd ChenToons-backend
 ```
 
