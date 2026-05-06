@@ -72,6 +72,9 @@ func (h SeriesHandler) CargarSeriesChenin(c *fiber.Ctx) error {
 		}
 		series = append(series, serie)
 	}
+	if err := rows.Err(); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
 
 	totalPages := 0
 	if total > 0 {
@@ -185,7 +188,7 @@ func (h SeriesHandler) EliminarSerieChen(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "serie no encontrada"})
 	}
 
-	return c.JSON(fiber.Map{"mensaje": "serie eliminada"})
+	return c.SendStatus(fiber.StatusNoContent)
 }
 
 func (h SeriesHandler) ExportarCSVChenin(c *fiber.Ctx) error {
@@ -214,6 +217,9 @@ func (h SeriesHandler) ExportarCSVChenin(c *fiber.Ctx) error {
 			s.Imagen, strconv.FormatBool(s.Destacada),
 		})
 	}
+	if err := rows.Err(); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
 	writer.Flush()
 
 	return nil
@@ -237,7 +243,11 @@ func filtrosSeriesChen(c *fiber.Ctx) (string, []any) {
 		partes = append(partes, fmt.Sprintf("LOWER(%s) LIKE $%d", campo, len(args)))
 	}
 
-	agregar("nombre", c.Query("search"), false)
+	search := c.Query("search")
+	if strings.TrimSpace(search) == "" {
+		search = c.Query("q")
+	}
+	agregar("nombre", search, false)
 	agregar("genero", c.Query("genero"), true)
 	agregar("categoria", c.Query("categoria"), true)
 	agregar("estado", c.Query("estado"), true)

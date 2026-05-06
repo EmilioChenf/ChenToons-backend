@@ -45,6 +45,9 @@ func (h EpisodiosHandler) CargarEpisodiosEmilio(c *fiber.Ctx) error {
 		}
 		episodios = append(episodios, e)
 	}
+	if err := rows.Err(); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
 
 	return c.JSON(episodios)
 }
@@ -78,6 +81,13 @@ func (h EpisodiosHandler) CrearEpisodioChen(c *fiber.Ctx) error {
 	if strings.TrimSpace(e.Titulo) == "" || e.SerieID == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "titulo y serie_id son obligatorios"})
 	}
+	existe, err := existeSerieChenin(h.DB, e.SerieID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if !existe {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "serie no encontrada"})
+	}
 	fecha, err := fechaEpisodioJosuc(e.FechaEstreno)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "fecha_estreno debe usar formato YYYY-MM-DD"})
@@ -107,6 +117,13 @@ func (h EpisodiosHandler) ActualizarEpisodioChen(c *fiber.Ctx) error {
 	}
 	if strings.TrimSpace(e.Titulo) == "" || e.SerieID == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "titulo y serie_id son obligatorios"})
+	}
+	existe, err := existeSerieChenin(h.DB, e.SerieID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if !existe {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "serie no encontrada"})
 	}
 	fecha, err := fechaEpisodioJosuc(e.FechaEstreno)
 	if err != nil {
@@ -145,7 +162,7 @@ func (h EpisodiosHandler) EliminarEpisodioChen(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "episodio no encontrado"})
 	}
 
-	return c.JSON(fiber.Map{"mensaje": "episodio eliminado"})
+	return c.SendStatus(fiber.StatusNoContent)
 }
 
 type filaEpisodio interface {

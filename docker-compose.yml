@@ -4,6 +4,9 @@ services:
     container_name: chentoons_backend
     environment:
       APP_PORT: 8080
+      PORT: 8080
+      APP_ENV: development
+      UPLOAD_DIR: /app/uploads
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-chentoons}

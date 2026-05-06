@@ -13,10 +13,15 @@ type UploadsHandler struct {
 	Folder string
 }
 
+const maxUploadChenin int64 = 1024 * 1024
+
 func (h UploadsHandler) SubirImagenChenin(c *fiber.Ctx) error {
 	file, err := c.FormFile("imagen")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "manda una imagen en el campo 'imagen'"})
+	}
+	if file.Size > maxUploadChenin {
+		return c.Status(fiber.StatusRequestEntityTooLarge).JSON(fiber.Map{"error": "la imagen no debe pesar mas de 1MB"})
 	}
 
 	ext := strings.ToLower(filepath.Ext(file.Filename))

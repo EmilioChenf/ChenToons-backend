@@ -6,12 +6,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func RegistrarRutasChen(app *fiber.App, db *pgxpool.Pool) {
+func RegistrarRutasChen(app *fiber.App, db *pgxpool.Pool, uploadDir string) {
 	series := handlers.SeriesHandler{DB: db}
 	personajes := handlers.PersonajesHandler{DB: db}
 	episodios := handlers.EpisodiosHandler{DB: db}
 	ratings := handlers.RatingsHandler{DB: db}
-	uploads := handlers.UploadsHandler{Folder: "./uploads"}
+	uploads := handlers.UploadsHandler{Folder: uploadDir}
 
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
@@ -43,7 +43,7 @@ func RegistrarRutasChen(app *fiber.App, db *pgxpool.Pool) {
 	app.Get("/series/:id/promedio-rating", ratings.PromedioRatingToon)
 
 	app.Post("/uploads", uploads.SubirImagenChenin)
-	app.Static("/uploads", "./uploads")
+	app.Static("/uploads", uploadDir)
 
 	app.Get("/export/series.csv", series.ExportarCSVChenin)
 

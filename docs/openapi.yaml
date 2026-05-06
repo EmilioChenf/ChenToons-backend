@@ -17,6 +17,7 @@ paths:
       summary: Lista series con busqueda, filtros, paginacion y ordenamiento
       parameters:
         - { name: search, in: query, schema: { type: string } }
+        - { name: q, in: query, schema: { type: string }, description: Alias corto de search }
         - { name: genero, in: query, schema: { type: string } }
         - { name: categoria, in: query, schema: { type: string } }
         - { name: estado, in: query, schema: { type: string } }
@@ -27,6 +28,8 @@ paths:
       responses:
         "200":
           description: Lista de series
+        "400":
+          $ref: "#/components/responses/Error"
     post:
       summary: Crea una serie
       requestBody:
@@ -38,6 +41,8 @@ paths:
       responses:
         "201":
           description: Serie creada
+        "400":
+          $ref: "#/components/responses/Error"
   /series/{id}:
     get:
       summary: Obtiene una serie por id
@@ -46,6 +51,8 @@ paths:
       responses:
         "200":
           description: Serie encontrada
+        "404":
+          $ref: "#/components/responses/Error"
     put:
       summary: Actualiza una serie
       parameters:
@@ -59,13 +66,19 @@ paths:
       responses:
         "200":
           description: Serie actualizada
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
     delete:
       summary: Elimina una serie
       parameters:
         - $ref: "#/components/parameters/Id"
       responses:
-        "200":
-          description: Serie eliminada
+        "204":
+          description: Serie eliminada sin contenido
+        "404":
+          $ref: "#/components/responses/Error"
   /personajes:
     get:
       summary: Lista personajes
@@ -74,6 +87,8 @@ paths:
       responses:
         "200":
           description: Lista de personajes
+        "400":
+          $ref: "#/components/responses/Error"
     post:
       summary: Crea un personaje
       requestBody:
@@ -84,6 +99,10 @@ paths:
       responses:
         "201":
           description: Personaje creado
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
   /personajes/{id}:
     get:
       summary: Obtiene un personaje
@@ -92,6 +111,8 @@ paths:
       responses:
         "200":
           description: Personaje encontrado
+        "404":
+          $ref: "#/components/responses/Error"
     put:
       summary: Actualiza un personaje
       parameters:
@@ -104,13 +125,19 @@ paths:
       responses:
         "200":
           description: Personaje actualizado
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
     delete:
       summary: Elimina un personaje
       parameters:
         - $ref: "#/components/parameters/Id"
       responses:
-        "200":
-          description: Personaje eliminado
+        "204":
+          description: Personaje eliminado sin contenido
+        "404":
+          $ref: "#/components/responses/Error"
   /episodios:
     get:
       summary: Lista episodios
@@ -119,6 +146,8 @@ paths:
       responses:
         "200":
           description: Lista de episodios
+        "400":
+          $ref: "#/components/responses/Error"
     post:
       summary: Crea un episodio
       requestBody:
@@ -129,6 +158,10 @@ paths:
       responses:
         "201":
           description: Episodio creado
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
   /episodios/{id}:
     get:
       summary: Obtiene un episodio
@@ -137,6 +170,8 @@ paths:
       responses:
         "200":
           description: Episodio encontrado
+        "404":
+          $ref: "#/components/responses/Error"
     put:
       summary: Actualiza un episodio
       parameters:
@@ -149,13 +184,19 @@ paths:
       responses:
         "200":
           description: Episodio actualizado
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
     delete:
       summary: Elimina un episodio
       parameters:
         - $ref: "#/components/parameters/Id"
       responses:
-        "200":
-          description: Episodio eliminado
+        "204":
+          description: Episodio eliminado sin contenido
+        "404":
+          $ref: "#/components/responses/Error"
   /series/{id}/ratings:
     get:
       summary: Lista ratings de una serie
@@ -164,6 +205,10 @@ paths:
       responses:
         "200":
           description: Lista de ratings
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
     post:
       summary: Crea rating de 1 a 5
       parameters:
@@ -176,6 +221,10 @@ paths:
       responses:
         "201":
           description: Rating creado
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
   /series/{id}/promedio-rating:
     get:
       summary: Promedio de ratings de una serie
@@ -184,6 +233,10 @@ paths:
       responses:
         "200":
           description: Promedio calculado
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
   /uploads:
     post:
       summary: Sube una imagen local
@@ -199,6 +252,10 @@ paths:
       responses:
         "201":
           description: Imagen subida
+        "400":
+          $ref: "#/components/responses/Error"
+        "413":
+          $ref: "#/components/responses/Error"
   /uploads/{filename}:
     get:
       summary: Sirve una imagen local
@@ -218,6 +275,13 @@ paths:
         "200":
           description: Archivo CSV
 components:
+  responses:
+    Error:
+      description: Error en formato JSON
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   parameters:
     Id:
       name: id
@@ -226,6 +290,12 @@ components:
       schema:
         type: integer
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: nombre es obligatorio
     SerieInput:
       type: object
       required: [nombre]

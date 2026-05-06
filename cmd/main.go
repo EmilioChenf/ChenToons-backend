@@ -15,7 +15,7 @@ import (
 func main() {
 	cfg := config.LoadCheninConfig()
 
-	if err := os.MkdirAll("./uploads", 0755); err != nil {
+	if err := os.MkdirAll(cfg.UploadDir, 0755); err != nil {
 		log.Fatal(err)
 	}
 
@@ -33,7 +33,8 @@ func main() {
 	}
 
 	app := fiber.New(fiber.Config{
-		AppName: "ChenToons API",
+		AppName:   "ChenToons API",
+		BodyLimit: 2 * 1024 * 1024,
 	})
 
 	app.Use(logger.New())
@@ -43,8 +44,8 @@ func main() {
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
 
-	routes.RegistrarRutasChen(app, db)
+	routes.RegistrarRutasChen(app, db, cfg.UploadDir)
 
-	log.Println("ChenToons escuchando en puerto " + cfg.AppPort)
-	log.Fatal(app.Listen(":" + cfg.AppPort))
+	log.Printf("ChenToons escuchando en 0.0.0.0:%s (%s)", cfg.AppPort, cfg.AppEnv)
+	log.Fatal(app.Listen("0.0.0.0:" + cfg.AppPort))
 }

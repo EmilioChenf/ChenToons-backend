@@ -27,6 +27,13 @@ func (h RatingsHandler) CargarRatingsSerieChen(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "id invalido"})
 	}
+	existe, err := existeSerieChenin(h.DB, serieID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if !existe {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "serie no encontrada"})
+	}
 
 	rows, err := h.DB.Query(context.Background(), `SELECT id, serie_id, puntuacion, comentario,
 		created_at FROM ratings WHERE serie_id=$1 ORDER BY created_at DESC, id DESC`, serieID)
@@ -112,6 +119,13 @@ func (h RatingsHandler) PromedioRatingToon(c *fiber.Ctx) error {
 	serieID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "id invalido"})
+	}
+	existe, err := existeSerieChenin(h.DB, serieID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if !existe {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "serie no encontrada"})
 	}
 
 	var promedio float64

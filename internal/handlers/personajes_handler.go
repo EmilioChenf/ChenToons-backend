@@ -43,6 +43,9 @@ func (h PersonajesHandler) CargarPersonajesChen(c *fiber.Ctx) error {
 		}
 		personajes = append(personajes, p)
 	}
+	if err := rows.Err(); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
 
 	return c.JSON(personajes)
 }
@@ -75,8 +78,15 @@ func (h PersonajesHandler) CrearPersonajeChen(c *fiber.Ctx) error {
 	if strings.TrimSpace(p.Nombre) == "" || p.SerieID == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "nombre y serie_id son obligatorios"})
 	}
+	existe, err := existeSerieChenin(h.DB, p.SerieID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if !existe {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "serie no encontrada"})
+	}
 
-	err := h.DB.QueryRow(context.Background(), `INSERT INTO personajes
+	err = h.DB.QueryRow(context.Background(), `INSERT INTO personajes
 		(serie_id, nombre, descripcion, rol, personalidad)
 		VALUES ($1,$2,$3,$4,$5) RETURNING id, created_at`,
 		p.SerieID, p.Nombre, p.Descripcion, p.Rol, p.Personalidad,
@@ -100,6 +110,13 @@ func (h PersonajesHandler) ActualizarPersonajeJosuc(c *fiber.Ctx) error {
 	}
 	if strings.TrimSpace(p.Nombre) == "" || p.SerieID == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "nombre y serie_id son obligatorios"})
+	}
+	existe, err := existeSerieChenin(h.DB, p.SerieID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if !existe {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "serie no encontrada"})
 	}
 
 	err = h.DB.QueryRow(context.Background(), `UPDATE personajes SET
@@ -131,5 +148,5 @@ func (h PersonajesHandler) EliminarPersonajeChen(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "personaje no encontrado"})
 	}
 
-	return c.JSON(fiber.Map{"mensaje": "personaje eliminado"})
+	return c.SendStatus(fiber.StatusNoContent)
 }

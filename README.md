@@ -11,6 +11,20 @@ ChenToons es una API REST sencilla para llevar un tracker de series y caricatura
 - OpenAPI / Swagger UI
 - CSV para exportar series y abrirlas en Excel
 
+## Variables de entorno
+
+El backend funciona con variables separadas para Docker local o con `DATABASE_URL` para Render.
+
+Variables principales:
+
+- `PORT`: puerto que usa Render.
+- `APP_PORT`: puerto local opcional. Si existe, tiene prioridad sobre `PORT`.
+- `APP_ENV`: `development` o `production`.
+- `UPLOAD_DIR`: carpeta donde se guardan imagenes. En Docker local se usa `/app/uploads`; en Render se monta como disco persistente.
+- `DATABASE_URL`: URL completa de PostgreSQL para Render.
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSLMODE`: alternativa local si no usas `DATABASE_URL`.
+- `CORS_ORIGIN`: origen permitido para el frontend. Para pruebas puede ser `*`.
+
 ## Correr con Docker
 
 1. Crea el archivo `.env` desde el ejemplo:
@@ -59,6 +73,7 @@ PostgreSQL corre en el puerto `5432` y el backend en `8080`.
 `GET /series` acepta:
 
 - `search`
+- `q` (alias de `search`)
 - `genero`
 - `categoria`
 - `estado`
@@ -71,6 +86,12 @@ Ejemplo:
 
 ```bash
 curl "http://localhost:8080/series?search=snoopy&page=1&limit=8&sort=nombre&order=asc"
+```
+
+Tambien puedes usar:
+
+```bash
+curl "http://localhost:8080/series?q=snoopy"
 ```
 
 ## Swagger
@@ -104,6 +125,7 @@ fetch("http://localhost:8080/series")
 ## Subir imagenes
 
 El campo del formulario debe llamarse `imagen`.
+El backend acepta imagenes `.jpg`, `.jpeg`, `.png`, `.webp` y `.gif` de hasta 1MB.
 
 ```bash
 curl -X POST http://localhost:8080/uploads \
@@ -131,7 +153,25 @@ El CSV se puede abrir manualmente con Excel o usarlo desde el frontend como desc
 
 ## Seeds
 
-Al iniciar, si la tabla `series` esta vacia, el backend crea datos iniciales relacionados con Pocoyo, Escandalosos, Snoopy, Bluey, Doraemon, Gravity Falls y otras caricaturas. Tambien crea algunos personajes, episodios y ratings.
+Al iniciar, el backend asegura datos iniciales relacionados con Pocoyo, Escandalosos, Snoopy, Bluey, Doraemon, Gravity Falls y otras caricaturas. El seed es idempotente: reutiliza series existentes por nombre y solo completa personajes, episodios y ratings que falten.
+
+## Render
+
+El repo incluye `render.yaml` para desplegar el backend como servicio Docker, crear PostgreSQL en Render y montar un disco persistente para `uploads`.
+
+Nota: Render Persistent Disk requiere un servicio web de pago. Por eso `render.yaml` usa `plan: starter` para el backend. Si usas plan gratis, los uploads funcionaran, pero se perderan al redeploy porque el filesystem es efimero.
+
+Pasos sugeridos:
+
+1. Sube este repo backend a GitHub.
+2. En Render, crea un Blueprint desde el repo.
+3. Render leera `render.yaml`.
+4. Verifica que `DATABASE_URL` quede conectado a `chentoons-postgres`.
+5. Verifica que el disco `chentoons-uploads` este montado en `/app/uploads`.
+6. Configura `CORS_ORIGIN` con la URL de tu frontend publicado, o deja `*` durante pruebas.
+7. Cuando despliegue, prueba `/health`, `/series`, `/uploads/archivo.jpg` y `/docs`.
+
+El backend tambien acepta `DATABASE_URL` directamente, por si prefieres configurar un Web Service y una base Postgres manualmente.
 
 ## Reflection breve
 
