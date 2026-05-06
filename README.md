@@ -146,6 +146,12 @@ El archivo OpenAPI esta en:
 docs/openapi.yaml
 ```
 
+En Render sera la misma ruta con el dominio publicado:
+
+```text
+https://TU-BACKEND-RENDER.onrender.com/swagger/index.html
+```
+
 ## CORS
 
 El backend tiene CORS configurado para que el frontend pueda consumir la API desde otro puerto o dominio.

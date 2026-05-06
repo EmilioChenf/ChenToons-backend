@@ -51,10 +51,16 @@ func RegistrarRutasChen(app *fiber.App, db *pgxpool.Pool, uploadDir string) {
 		return c.SendFile("./docs/swagger.html")
 	})
 	app.Get("/swagger", func(c *fiber.Ctx) error {
-		return c.Redirect("/docs")
+		return c.Redirect("/swagger/index.html")
 	})
 	app.Get("/swagger/index.html", func(c *fiber.Ctx) error {
-		return c.Redirect("/docs")
+		return c.SendFile("./docs/swagger.html")
+	})
+	app.Get("/swagger/openapi.yaml", func(c *fiber.Ctx) error {
+		return c.SendFile("./docs/openapi.yaml")
+	})
+	app.Get("/swagger/*", func(c *fiber.Ctx) error {
+		return c.SendFile("./docs/swagger.html")
 	})
 	app.Get("/docs/openapi.yaml", func(c *fiber.Ctx) error {
 		return c.SendFile("./docs/openapi.yaml")
