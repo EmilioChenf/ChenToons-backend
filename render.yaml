@@ -2,7 +2,7 @@ services:
   - type: web
     name: chentoons-backend
     runtime: docker
-    plan: starter
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health
@@ -21,10 +21,6 @@ services:
         value: require
       - key: CORS_ORIGIN
         value: "*"
-    disk:
-      name: chentoons-uploads
-      mountPath: /app/uploads
-      sizeGB: 1
 
 databases:
   - name: chentoons-postgres

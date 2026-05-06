@@ -18,9 +18,9 @@ El backend funciona con variables separadas para Docker local o con `DATABASE_UR
 Variables principales:
 
 - `PORT`: puerto que usa Render.
-- `APP_PORT`: puerto local opcional. Si existe, tiene prioridad sobre `PORT`.
+- `APP_PORT`: puerto local opcional. `PORT` tiene prioridad cuando existe, como en Render.
 - `APP_ENV`: `development` o `production`.
-- `UPLOAD_DIR`: carpeta donde se guardan imagenes. En Docker local se usa `/app/uploads`; en Render se monta como disco persistente.
+- `UPLOAD_DIR`: carpeta donde se guardan imagenes subidas. En Docker local se usa `/app/uploads`; en Render sin Persistent Disk es almacenamiento efimero.
 - `DATABASE_URL`: URL completa de PostgreSQL para Render.
 - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSLMODE`: alternativa local si no usas `DATABASE_URL`.
 - `CORS_ORIGIN`: origen permitido para el frontend. Para pruebas puede ser `*`.
@@ -143,6 +143,10 @@ La respuesta devuelve una ruta como:
 
 Esa ruta se puede guardar en `imagen` al crear o actualizar una serie.
 
+En local y Docker, `uploads` funciona normal porque `docker-compose.yml` monta `./uploads` en `/app/uploads`.
+En Render sin Persistent Disk, el backend sigue creando la carpeta y aceptando uploads, pero esos archivos pueden perderse al redeploy o reinicio del servicio.
+Por eso las imagenes base del seed pueden guardarse como rutas tipo `/uploads/bluey.jpg` en la base, mientras el frontend publicado las muestra desde `assets/images/` sin depender de que esos archivos existan en Render.
+
 ## Exportar CSV
 
 ```bash
@@ -157,9 +161,15 @@ Al iniciar, el backend asegura datos iniciales relacionados con Pocoyo, Escandal
 
 ## Render
 
-El repo incluye `render.yaml` para desplegar el backend como servicio Docker, crear PostgreSQL en Render y montar un disco persistente para `uploads`.
+El repo incluye `render.yaml` para desplegar el backend como servicio Docker y conectarlo a PostgreSQL de Render.
 
-Nota: Render Persistent Disk requiere un servicio web de pago. Por eso `render.yaml` usa `plan: starter` para el backend. Si usas plan gratis, los uploads funcionaran, pero se perderan al redeploy porque el filesystem es efimero.
+Este proyecto esta preparado para Render sin Persistent Disk:
+
+- El backend crea automaticamente `UPLOAD_DIR` si no existe.
+- `POST /uploads` sigue funcionando.
+- `GET /uploads/:filename` sigue disponible.
+- Si Render reinicia o redeploya el servicio, los archivos subidos pueden perderse porque el filesystem gratuito es efimero.
+- Las imagenes base/seed deben mostrarse desde el frontend publicado, por ejemplo desde `assets/images/`.
 
 Pasos sugeridos:
 
@@ -167,9 +177,8 @@ Pasos sugeridos:
 2. En Render, crea un Blueprint desde el repo.
 3. Render leera `render.yaml`.
 4. Verifica que `DATABASE_URL` quede conectado a `chentoons-postgres`.
-5. Verifica que el disco `chentoons-uploads` este montado en `/app/uploads`.
-6. Configura `CORS_ORIGIN` con la URL de tu frontend publicado, o deja `*` durante pruebas.
-7. Cuando despliegue, prueba `/health`, `/series`, `/uploads/archivo.jpg` y `/docs`.
+5. Configura `CORS_ORIGIN` con la URL de tu frontend publicado, o deja `*` durante pruebas.
+6. Cuando despliegue, prueba `/health`, `/series`, `/uploads/archivo.jpg` y `/docs`.
 
 El backend tambien acepta `DATABASE_URL` directamente, por si prefieres configurar un Web Service y una base Postgres manualmente.
 
