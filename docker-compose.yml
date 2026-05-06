@@ -1,0 +1,42 @@
+services:
+  backend:
+    build: .
+    container_name: chentoons_backend
+    environment:
+      APP_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-chentoons}
+      DB_PASSWORD: ${DB_PASSWORD:-chentoons123}
+      DB_NAME: ${DB_NAME:-chentoons_db}
+      DB_SSLMODE: disable
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: chentoons_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-chentoons}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-chentoons123}
+      POSTGRES_DB: ${DB_NAME:-chentoons_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-chentoons} -d ${DB_NAME:-chentoons_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

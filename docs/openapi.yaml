@@ -1,0 +1,273 @@
+openapi: 3.0.3
+info:
+  title: ChenToons API
+  version: "1.0.0"
+  description: API REST sencilla para un tracker de series y caricaturas.
+servers:
+  - url: http://localhost:8080
+paths:
+  /health:
+    get:
+      summary: Revisa si el backend esta vivo
+      responses:
+        "200":
+          description: OK
+  /series:
+    get:
+      summary: Lista series con busqueda, filtros, paginacion y ordenamiento
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+        - { name: genero, in: query, schema: { type: string } }
+        - { name: categoria, in: query, schema: { type: string } }
+        - { name: estado, in: query, schema: { type: string } }
+        - { name: sort, in: query, schema: { type: string, example: nombre } }
+        - { name: order, in: query, schema: { type: string, example: asc } }
+        - { name: page, in: query, schema: { type: integer, example: 1 } }
+        - { name: limit, in: query, schema: { type: integer, example: 8 } }
+      responses:
+        "200":
+          description: Lista de series
+    post:
+      summary: Crea una serie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SerieInput"
+      responses:
+        "201":
+          description: Serie creada
+  /series/{id}:
+    get:
+      summary: Obtiene una serie por id
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Serie encontrada
+    put:
+      summary: Actualiza una serie
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SerieInput"
+      responses:
+        "200":
+          description: Serie actualizada
+    delete:
+      summary: Elimina una serie
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Serie eliminada
+  /personajes:
+    get:
+      summary: Lista personajes
+      parameters:
+        - { name: serie_id, in: query, schema: { type: integer } }
+      responses:
+        "200":
+          description: Lista de personajes
+    post:
+      summary: Crea un personaje
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonajeInput"
+      responses:
+        "201":
+          description: Personaje creado
+  /personajes/{id}:
+    get:
+      summary: Obtiene un personaje
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Personaje encontrado
+    put:
+      summary: Actualiza un personaje
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonajeInput"
+      responses:
+        "200":
+          description: Personaje actualizado
+    delete:
+      summary: Elimina un personaje
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Personaje eliminado
+  /episodios:
+    get:
+      summary: Lista episodios
+      parameters:
+        - { name: serie_id, in: query, schema: { type: integer } }
+      responses:
+        "200":
+          description: Lista de episodios
+    post:
+      summary: Crea un episodio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EpisodioInput"
+      responses:
+        "201":
+          description: Episodio creado
+  /episodios/{id}:
+    get:
+      summary: Obtiene un episodio
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Episodio encontrado
+    put:
+      summary: Actualiza un episodio
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EpisodioInput"
+      responses:
+        "200":
+          description: Episodio actualizado
+    delete:
+      summary: Elimina un episodio
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Episodio eliminado
+  /series/{id}/ratings:
+    get:
+      summary: Lista ratings de una serie
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Lista de ratings
+    post:
+      summary: Crea rating de 1 a 5
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RatingInput"
+      responses:
+        "201":
+          description: Rating creado
+  /series/{id}/promedio-rating:
+    get:
+      summary: Promedio de ratings de una serie
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Promedio calculado
+  /uploads:
+    post:
+      summary: Sube una imagen local
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                imagen:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Imagen subida
+  /uploads/{filename}:
+    get:
+      summary: Sirve una imagen local
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Archivo de imagen
+  /export/series.csv:
+    get:
+      summary: Exporta series en CSV compatible con Excel
+      responses:
+        "200":
+          description: Archivo CSV
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas:
+    SerieInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre: { type: string, example: Snoopy y Charlie Brown }
+        descripcion: { type: string }
+        categoria: { type: string, example: Clasica }
+        genero: { type: string, example: Comedia }
+        anio_lanzamiento: { type: integer, example: 1965 }
+        temporadas: { type: integer, example: 3 }
+        estado: { type: string, example: Clasica }
+        plataforma: { type: string, example: Apple TV+ }
+        creador: { type: string, example: Charles M. Schulz }
+        pais_origen: { type: string, example: Estados Unidos }
+        imagen: { type: string, example: /uploads/snoopy.jpg }
+        color_tema: { type: string, example: "#f6d04d" }
+        destacada: { type: boolean, example: true }
+    PersonajeInput:
+      type: object
+      required: [serie_id, nombre]
+      properties:
+        serie_id: { type: integer, example: 1 }
+        nombre: { type: string, example: Snoopy }
+        descripcion: { type: string }
+        rol: { type: string, example: Protagonista }
+        personalidad: { type: string, example: Creativo }
+        imagen: { type: string, example: /uploads/snoopy-personaje.jpg }
+    EpisodioInput:
+      type: object
+      required: [serie_id, titulo]
+      properties:
+        serie_id: { type: integer, example: 1 }
+        titulo: { type: string, example: Una pequena victoria }
+        temporada: { type: integer, example: 1 }
+        numero_episodio: { type: integer, example: 1 }
+        descripcion: { type: string }
+        duracion_minutos: { type: integer, example: 25 }
+        fecha_estreno: { type: string, format: date, example: "1965-12-09" }
+        imagen: { type: string, example: /uploads/ep-snoopy.jpg }
+    RatingInput:
+      type: object
+      required: [puntuacion]
+      properties:
+        puntuacion: { type: integer, minimum: 1, maximum: 5, example: 5 }
+        comentario: { type: string, example: Muy bonita para ver en familia }

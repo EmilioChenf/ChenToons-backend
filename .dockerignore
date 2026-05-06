@@ -1,0 +1,15 @@
+.git
+.env
+postgres-data
+pgdata
+tmp
+temp
+logs
+*.log
+node_modules
+bin
+dist
+build
+*.exe
+uploads/*
+!uploads/.gitkeep
