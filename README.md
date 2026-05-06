@@ -166,18 +166,33 @@ En produccion conviene cambiarlo por la URL real del frontend publicado en Rende
 
 ## Challenges implementados
 
-- Swagger/OpenAPI.
-- Swagger UI servido desde el backend.
-- Validaciones server-side.
-- Codigos HTTP correctos.
-- Paginacion en `/series`.
-- Busqueda por `search` o `q`.
-- Ordenamiento con `sort` y `order`.
-- Sistema de rating con tabla propia.
-- Upload de imagenes para series.
-- Exportacion CSV.
-- Docker con backend y PostgreSQL.
+### API y Backend
+
+- Swagger/OpenAPI documentado en `docs/openapi.yaml`.
+- Swagger UI servido desde el backend en `/swagger/index.html`.
+- Codigos HTTP correctos para crear, eliminar, validar y manejar recursos no encontrados.
+- Validaciones server-side con respuestas JSON claras.
+- Paginacion en `/series` usando `page` y `limit`.
+- Busqueda por nombre usando `search` o `q`.
+- Ordenamiento con `sort` y `order=asc|desc`.
+- Sistema de ratings con tabla propia y promedio por serie.
+- Subida de imagenes para series usando `/uploads`.
+- Exportacion CSV desde `/export/series.csv`.
+- Docker y Docker Compose con backend, PostgreSQL, volumen de base de datos y carpeta de uploads.
 - Seeds iniciales coherentes e idempotentes.
+
+### Frontend
+
+- Consumo de API REST usando `fetch()`.
+- CRUD completo de series desde la interfaz.
+- Filtros dinamicos conectados a los parametros del backend.
+- Busqueda desde la interfaz.
+- Ordenamiento visual usando los parametros de la API.
+- Paginacion visual conectada a `page` y `limit`.
+- Modal de detalles para ver y administrar informacion relacionada.
+- Manejo de ratings y comentarios desde la interfaz.
+- Exportacion CSV manual apoyada en el endpoint del backend.
+- Preparado para trabajar como repositorio separado del backend.
 
 ## Deploy
 
