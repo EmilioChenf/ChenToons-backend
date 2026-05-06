@@ -1,79 +1,117 @@
 # ChenToons Backend
 
-ChenToons es una API REST sencilla para llevar un tracker de series y caricaturas como Pocoyo, Escandalosos, Snoopy, Bluey y otras parecidas. El proyecto esta hecho con Go, Fiber, PostgreSQL y Docker, pensando en que sea facil de correr, explicar y conectar con un frontend universitario.
+ChenToons Backend es una API REST para administrar series animadas. El proyecto usa Go + Fiber + PostgreSQL, corre con Docker y expone documentacion con Swagger/OpenAPI.
 
-## Tecnologias
+La API maneja series, personajes, episodios, ratings, subida de imagenes y exportacion CSV. Esta pensada para trabajar con un frontend separado hecho en HTML, CSS y JavaScript vanilla.
 
-- Go 1.22
+## Tecnologias usadas
+
+- Go
 - Fiber
 - PostgreSQL
-- Docker y Docker Compose
-- OpenAPI / Swagger UI
-- CSV para exportar series y abrirlas en Excel
+- Docker
+- Swagger/OpenAPI
 
-## Variables de entorno
+## Como correr localmente
 
-El backend funciona con variables separadas para Docker local o con `DATABASE_URL` para Render.
-
-Variables principales:
-
-- `PORT`: puerto que usa Render.
-- `APP_PORT`: puerto local opcional. `PORT` tiene prioridad cuando existe, como en Render.
-- `APP_ENV`: `development` o `production`.
-- `UPLOAD_DIR`: carpeta donde se guardan imagenes subidas. En Docker local se usa `/app/uploads`; en Render sin Persistent Disk es almacenamiento efimero.
-- `DATABASE_URL`: URL completa de PostgreSQL para Render.
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSLMODE`: alternativa local si no usas `DATABASE_URL`.
-- `CORS_ORIGIN`: origen permitido para el frontend. Para pruebas puede ser `*`.
-
-## Correr con Docker
-
-1. Crea el archivo `.env` desde el ejemplo:
+1. Clonar este repositorio:
 
 ```bash
-cp .env.example .env
+git clone URL_DEL_REPOSITORIO_BACKEND
+cd ChenToons-backend
 ```
 
-En Windows tambien puedes copiarlo manualmente.
-
-2. Levanta backend y base de datos:
+2. Levantar backend y base de datos con Docker:
 
 ```bash
 docker compose up --build
 ```
 
-3. Prueba que vive:
+3. Probar las URLs principales:
 
-```bash
-curl http://localhost:8080/health
+```text
+http://localhost:8080/health
+http://localhost:8080/series
+http://localhost:8080/swagger/index.html
 ```
 
-PostgreSQL corre en el puerto `5432` y el backend en `8080`.
+Tambien puedes usar:
+
+```text
+http://localhost:8080/docs
+```
+
+## Variables de entorno
+
+El backend puede conectarse a PostgreSQL usando `DATABASE_URL` o variables separadas.
+
+Variables principales:
+
+- `DATABASE_URL`: URL completa de PostgreSQL, usada normalmente en Render.
+- `PORT`: puerto que usa Render.
+- `APP_ENV`: ambiente del proyecto, por ejemplo `development` o `production`.
+- `UPLOAD_DIR`: carpeta donde se guardan imagenes subidas.
+- `CORS_ORIGIN`: origen permitido para el frontend.
+
+Variables locales opcionales si no usas `DATABASE_URL`:
+
+- `DB_HOST`
+- `DB_PORT`
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_NAME`
+- `DB_SSLMODE`
+
+El archivo `.env.example` trae valores de referencia para desarrollo local.
+
+## Docker
+
+El proyecto incluye `Dockerfile` y `docker-compose.yml`.
+
+Docker Compose levanta:
+
+- `backend`: API de ChenToons en Go + Fiber.
+- `postgres`: base de datos PostgreSQL.
+- `postgres_data`: volumen para persistir la base de datos.
+- `./uploads:/app/uploads`: carpeta local para imagenes subidas.
+
+Comando principal:
+
+```bash
+docker compose up --build
+```
+
+Para reiniciar todo desde cero, incluyendo la base:
+
+```bash
+docker compose down -v
+docker compose up --build
+```
 
 ## Endpoints principales
 
-- `GET /health`
-- `GET /series`
-- `GET /series/:id`
-- `POST /series`
-- `PUT /series/:id`
-- `DELETE /series/:id`
-- `GET /personajes`
-- `POST /personajes`
-- `GET /episodios`
-- `POST /episodios`
-- `GET /series/:id/ratings`
-- `POST /series/:id/ratings`
-- `GET /series/:id/promedio-rating`
-- `POST /uploads`
-- `GET /uploads/:filename`
-- `GET /export/series.csv`
-
-## Filtros de series
+| Metodo | Endpoint | Descripcion |
+|---|---|---|
+| GET | `/health` | Revisa si el backend esta activo |
+| GET | `/series` | Lista series con filtros, busqueda, paginacion y ordenamiento |
+| GET | `/series/:id` | Obtiene una serie por ID |
+| POST | `/series` | Crea una serie |
+| PUT | `/series/:id` | Edita una serie |
+| DELETE | `/series/:id` | Elimina una serie |
+| GET | `/personajes?serie_id=ID` | Lista personajes |
+| POST | `/personajes` | Crea un personaje |
+| GET | `/episodios?serie_id=ID` | Lista episodios |
+| POST | `/episodios` | Crea un episodio |
+| GET | `/series/:id/ratings` | Lista ratings de una serie |
+| POST | `/series/:id/ratings` | Agrega rating y comentario |
+| GET | `/series/:id/promedio-rating` | Calcula el promedio de rating |
+| POST | `/uploads` | Sube una imagen |
+| GET | `/uploads/:filename` | Sirve una imagen subida |
+| GET | `/export/series.csv` | Exporta series en CSV |
 
 `GET /series` acepta:
 
-- `search`
-- `q` (alias de `search`)
+- `search` o `q`
 - `genero`
 - `categoria`
 - `estado`
@@ -85,110 +123,92 @@ PostgreSQL corre en el puerto `5432` y el backend en `8080`.
 Ejemplo:
 
 ```bash
-curl "http://localhost:8080/series?search=snoopy&page=1&limit=8&sort=nombre&order=asc"
-```
-
-Tambien puedes usar:
-
-```bash
-curl "http://localhost:8080/series?q=snoopy"
+curl "http://localhost:8080/series?q=snoopy&page=1&limit=8&sort=nombre&order=asc"
 ```
 
 ## Swagger
 
-Abre esta ruta en el navegador:
+Swagger UI esta disponible en:
 
 ```text
-http://localhost:8080/docs
+http://localhost:8080/swagger/index.html
 ```
 
 Tambien funciona:
 
 ```text
-http://localhost:8080/swagger
+http://localhost:8080/docs
 ```
 
-El archivo OpenAPI esta en `docs/openapi.yaml`.
+El archivo OpenAPI esta en:
 
-## Probar CORS
-
-El backend permite CORS usando la variable `CORS_ORIGIN`. Para desarrollo viene como `*`.
-
-Desde un frontend local puedes llamar:
-
-```js
-fetch("http://localhost:8080/series")
-  .then((res) => res.json())
-  .then(console.log);
+```text
+docs/openapi.yaml
 ```
 
-## Subir imagenes
+## CORS
 
-El campo del formulario debe llamarse `imagen`.
-El backend acepta imagenes `.jpg`, `.jpeg`, `.png`, `.webp` y `.gif` de hasta 1MB.
+El backend tiene CORS configurado para que el frontend pueda consumir la API desde otro puerto o dominio.
 
-```bash
-curl -X POST http://localhost:8080/uploads \
-  -F "imagen=@snoopy.jpg"
+En desarrollo se puede usar:
+
+```text
+CORS_ORIGIN=*
 ```
 
-La respuesta devuelve una ruta como:
+En produccion conviene cambiarlo por la URL real del frontend publicado en Render.
 
-```json
-{
-  "mensaje": "imagen subida",
-  "ruta": "/uploads/1710000000-snoopy.jpg"
-}
+## Challenges implementados
+
+- Swagger/OpenAPI.
+- Swagger UI servido desde el backend.
+- Validaciones server-side.
+- Codigos HTTP correctos.
+- Paginacion en `/series`.
+- Busqueda por `search` o `q`.
+- Ordenamiento con `sort` y `order`.
+- Sistema de rating con tabla propia.
+- Upload de imagenes para series.
+- Exportacion CSV.
+- Docker con backend y PostgreSQL.
+- Seeds iniciales coherentes e idempotentes.
+
+## Deploy
+
+El backend esta preparado para Render usando Docker y PostgreSQL de Render.
+
+Archivo incluido:
+
+```text
+render.yaml
 ```
 
-Esa ruta se puede guardar en `imagen` al crear o actualizar una serie.
+URLs del proyecto:
 
-En local y Docker, `uploads` funciona normal porque `docker-compose.yml` monta `./uploads` en `/app/uploads`.
-En Render sin Persistent Disk, el backend sigue creando la carpeta y aceptando uploads, pero esos archivos pueden perderse al redeploy o reinicio del servicio.
-Por eso las imagenes base del seed pueden guardarse como rutas tipo `/uploads/bluey.jpg` en la base, mientras el frontend publicado las muestra desde `assets/images/` sin depender de que esos archivos existan en Render.
+- Backend Render: `https://cheentoons-backend.onrender.com/`
+- Frontend Render: `https://cheentoons-frontend.onrender.com/`
+- Repositorio frontend: `https://github.com/EmilioChenf/ChenToons-frontend`
 
-## Exportar CSV
+Notas para Render:
 
-```bash
-curl -o series_chentoons.csv http://localhost:8080/export/series.csv
-```
+- Render usa `PORT`, y el backend ya lo soporta.
+- Render puede usar `DATABASE_URL` para conectarse a PostgreSQL.
+- Sin Persistent Disk, los archivos subidos a `/uploads` pueden perderse al redeploy.
+- Las imagenes base del frontend pueden servirse desde `assets/images/`.
 
-El CSV se puede abrir manualmente con Excel o usarlo desde el frontend como descarga.
+## Screenshot
 
-## Seeds
+![ChenToons Backend](screenshots/backend.png)
 
-Al iniciar, el backend asegura datos iniciales relacionados con Pocoyo, Escandalosos, Snoopy, Bluey, Doraemon, Gravity Falls y otras caricaturas. El seed es idempotente: reutiliza series existentes por nombre y solo completa personajes, episodios y ratings que falten.
+> Pendiente agregar captura real de Swagger o de una respuesta de la API.
 
-## Render
+## Reflexion
 
-El repo incluye `render.yaml` para desplegar el backend como servicio Docker y conectarlo a PostgreSQL de Render.
+Con este backend practicamos como construir una API REST real usando Go y Fiber. Lo mas interesante fue conectar la API con PostgreSQL, manejar Docker y preparar el proyecto para correr igual en local y en Render. Tambien nos ayudo a entender mejor CORS, codigos HTTP, Swagger y la separacion entre backend y frontend.
 
-Este proyecto esta preparado para Render sin Persistent Disk:
+Go + Fiber se sintio bastante directo para este tipo de proyecto. Docker costo un poco al inicio, pero al final facilita mucho probar la base de datos y el backend sin configurar todo manualmente. Si hicieramos otro proyecto parecido, si volveriamos a usar esta stack porque es rapida, simple y facil de explicar.
 
-- El backend crea automaticamente `UPLOAD_DIR` si no existe.
-- `POST /uploads` sigue funcionando.
-- `GET /uploads/:filename` sigue disponible.
-- Si Render reinicia o redeploya el servicio, los archivos subidos pueden perderse porque el filesystem gratuito es efimero.
-- Las imagenes base/seed deben mostrarse desde el frontend publicado, por ejemplo desde `assets/images/`.
+## Autor
 
-Pasos sugeridos:
-
-1. Sube este repo backend a GitHub.
-2. En Render, crea un Blueprint desde el repo.
-3. Render leera `render.yaml`.
-4. Verifica que `DATABASE_URL` quede conectado a `chentoons-postgres`.
-5. Configura `CORS_ORIGIN` con la URL de tu frontend publicado, o deja `*` durante pruebas.
-6. Cuando despliegue, prueba `/health`, `/series`, `/uploads/archivo.jpg` y `/docs`.
-
-El backend tambien acepta `DATABASE_URL` directamente, por si prefieres configurar un Web Service y una base Postgres manualmente.
-
-## Reflection breve
-
-Este backend busca ser claro antes que enorme. Las migraciones estan en Go para no depender de herramientas extra, los handlers son directos y la estructura separa lo justo: config, database, models, handlers y routes. Para un video de explicacion, lo mas importante es mostrar Docker Compose, los endpoints CRUD, la carpeta `uploads`, Swagger y el CSV.
-
-## Screenshots pendientes
-
-- Captura de `/docs`
-- Captura de respuesta de `/series`
-- Captura de subida de imagen
-- Captura del CSV abierto en Excel
+Proyecto: ChenToons  
+Autor: Emilio Josue Chen Borrayo
