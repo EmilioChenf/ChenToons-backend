@@ -252,7 +252,6 @@ components:
         descripcion: { type: string }
         rol: { type: string, example: Protagonista }
         personalidad: { type: string, example: Creativo }
-        imagen: { type: string, example: /uploads/snoopy-personaje.jpg }
     EpisodioInput:
       type: object
       required: [serie_id, titulo]
@@ -264,7 +263,6 @@ components:
         descripcion: { type: string }
         duracion_minutos: { type: integer, example: 25 }
         fecha_estreno: { type: string, format: date, example: "1965-12-09" }
-        imagen: { type: string, example: /uploads/ep-snoopy.jpg }
     RatingInput:
       type: object
       required: [puntuacion]

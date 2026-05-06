@@ -119,7 +119,7 @@ La respuesta devuelve una ruta como:
 }
 ```
 
-Esa ruta se puede guardar en `imagen` al crear o actualizar una serie, personaje o episodio.
+Esa ruta se puede guardar en `imagen` al crear o actualizar una serie.
 
 ## Exportar CSV
 

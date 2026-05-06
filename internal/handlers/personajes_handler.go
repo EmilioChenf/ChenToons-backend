@@ -16,7 +16,7 @@ type PersonajesHandler struct {
 }
 
 func (h PersonajesHandler) CargarPersonajesChen(c *fiber.Ctx) error {
-	query := `SELECT id, serie_id, nombre, descripcion, rol, personalidad, imagen, created_at
+	query := `SELECT id, serie_id, nombre, descripcion, rol, personalidad, created_at
 		FROM personajes`
 	args := []any{}
 	if c.Query("serie_id") != "" {
@@ -38,7 +38,7 @@ func (h PersonajesHandler) CargarPersonajesChen(c *fiber.Ctx) error {
 	personajes := []models.Personaje{}
 	for rows.Next() {
 		var p models.Personaje
-		if err := rows.Scan(&p.ID, &p.SerieID, &p.Nombre, &p.Descripcion, &p.Rol, &p.Personalidad, &p.Imagen, &p.CreatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.SerieID, &p.Nombre, &p.Descripcion, &p.Rol, &p.Personalidad, &p.CreatedAt); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}
 		personajes = append(personajes, p)
@@ -55,8 +55,8 @@ func (h PersonajesHandler) ObtenerPersonajeChen(c *fiber.Ctx) error {
 
 	var p models.Personaje
 	err = h.DB.QueryRow(context.Background(), `SELECT id, serie_id, nombre, descripcion, rol,
-		personalidad, imagen, created_at FROM personajes WHERE id=$1`, id).
-		Scan(&p.ID, &p.SerieID, &p.Nombre, &p.Descripcion, &p.Rol, &p.Personalidad, &p.Imagen, &p.CreatedAt)
+		personalidad, created_at FROM personajes WHERE id=$1`, id).
+		Scan(&p.ID, &p.SerieID, &p.Nombre, &p.Descripcion, &p.Rol, &p.Personalidad, &p.CreatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "personaje no encontrado"})
@@ -77,9 +77,9 @@ func (h PersonajesHandler) CrearPersonajeChen(c *fiber.Ctx) error {
 	}
 
 	err := h.DB.QueryRow(context.Background(), `INSERT INTO personajes
-		(serie_id, nombre, descripcion, rol, personalidad, imagen)
-		VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, created_at`,
-		p.SerieID, p.Nombre, p.Descripcion, p.Rol, p.Personalidad, p.Imagen,
+		(serie_id, nombre, descripcion, rol, personalidad)
+		VALUES ($1,$2,$3,$4,$5) RETURNING id, created_at`,
+		p.SerieID, p.Nombre, p.Descripcion, p.Rol, p.Personalidad,
 	).Scan(&p.ID, &p.CreatedAt)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
@@ -103,10 +103,10 @@ func (h PersonajesHandler) ActualizarPersonajeJosuc(c *fiber.Ctx) error {
 	}
 
 	err = h.DB.QueryRow(context.Background(), `UPDATE personajes SET
-		serie_id=$1, nombre=$2, descripcion=$3, rol=$4, personalidad=$5, imagen=$6
-		WHERE id=$7 RETURNING id, serie_id, nombre, descripcion, rol, personalidad, imagen, created_at`,
-		p.SerieID, p.Nombre, p.Descripcion, p.Rol, p.Personalidad, p.Imagen, id,
-	).Scan(&p.ID, &p.SerieID, &p.Nombre, &p.Descripcion, &p.Rol, &p.Personalidad, &p.Imagen, &p.CreatedAt)
+		serie_id=$1, nombre=$2, descripcion=$3, rol=$4, personalidad=$5
+		WHERE id=$6 RETURNING id, serie_id, nombre, descripcion, rol, personalidad, created_at`,
+		p.SerieID, p.Nombre, p.Descripcion, p.Rol, p.Personalidad, id,
+	).Scan(&p.ID, &p.SerieID, &p.Nombre, &p.Descripcion, &p.Rol, &p.Personalidad, &p.CreatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "personaje no encontrado"})

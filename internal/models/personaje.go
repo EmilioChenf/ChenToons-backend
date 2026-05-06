@@ -9,6 +9,5 @@ type Personaje struct {
 	Descripcion  string    `json:"descripcion"`
 	Rol          string    `json:"rol"`
 	Personalidad string    `json:"personalidad"`
-	Imagen       string    `json:"imagen"`
 	CreatedAt    time.Time `json:"created_at"`
 }

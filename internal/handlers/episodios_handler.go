@@ -19,7 +19,7 @@ type EpisodiosHandler struct {
 
 func (h EpisodiosHandler) CargarEpisodiosEmilio(c *fiber.Ctx) error {
 	query := `SELECT id, serie_id, titulo, temporada, numero_episodio, descripcion,
-		duracion_minutos, fecha_estreno, imagen, created_at FROM episodios`
+		duracion_minutos, fecha_estreno, created_at FROM episodios`
 	args := []any{}
 	if c.Query("serie_id") != "" {
 		serieID, err := strconv.Atoi(c.Query("serie_id"))
@@ -56,7 +56,7 @@ func (h EpisodiosHandler) ObtenerEpisodioChen(c *fiber.Ctx) error {
 	}
 
 	row := h.DB.QueryRow(context.Background(), `SELECT id, serie_id, titulo, temporada,
-		numero_episodio, descripcion, duracion_minutos, fecha_estreno, imagen, created_at
+		numero_episodio, descripcion, duracion_minutos, fecha_estreno, created_at
 		FROM episodios WHERE id=$1`, id)
 
 	e, err := scanEpisodioChen(row)
@@ -84,9 +84,9 @@ func (h EpisodiosHandler) CrearEpisodioChen(c *fiber.Ctx) error {
 	}
 
 	err = h.DB.QueryRow(context.Background(), `INSERT INTO episodios
-		(serie_id, titulo, temporada, numero_episodio, descripcion, duracion_minutos, fecha_estreno, imagen)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id, created_at`,
-		e.SerieID, e.Titulo, e.Temporada, e.NumeroEpisodio, e.Descripcion, e.DuracionMinutos, fecha, e.Imagen,
+		(serie_id, titulo, temporada, numero_episodio, descripcion, duracion_minutos, fecha_estreno)
+		VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id, created_at`,
+		e.SerieID, e.Titulo, e.Temporada, e.NumeroEpisodio, e.Descripcion, e.DuracionMinutos, fecha,
 	).Scan(&e.ID, &e.CreatedAt)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
@@ -115,10 +115,10 @@ func (h EpisodiosHandler) ActualizarEpisodioChen(c *fiber.Ctx) error {
 
 	row := h.DB.QueryRow(context.Background(), `UPDATE episodios SET
 		serie_id=$1, titulo=$2, temporada=$3, numero_episodio=$4, descripcion=$5,
-		duracion_minutos=$6, fecha_estreno=$7, imagen=$8
-		WHERE id=$9 RETURNING id, serie_id, titulo, temporada, numero_episodio,
-		descripcion, duracion_minutos, fecha_estreno, imagen, created_at`,
-		e.SerieID, e.Titulo, e.Temporada, e.NumeroEpisodio, e.Descripcion, e.DuracionMinutos, fecha, e.Imagen, id,
+		duracion_minutos=$6, fecha_estreno=$7
+		WHERE id=$8 RETURNING id, serie_id, titulo, temporada, numero_episodio,
+		descripcion, duracion_minutos, fecha_estreno, created_at`,
+		e.SerieID, e.Titulo, e.Temporada, e.NumeroEpisodio, e.Descripcion, e.DuracionMinutos, fecha, id,
 	)
 	e, err = scanEpisodioChen(row)
 	if err != nil {
@@ -155,7 +155,7 @@ type filaEpisodio interface {
 func scanEpisodioChen(row filaEpisodio) (models.Episodio, error) {
 	var e models.Episodio
 	var fecha pgtype.Date
-	err := row.Scan(&e.ID, &e.SerieID, &e.Titulo, &e.Temporada, &e.NumeroEpisodio, &e.Descripcion, &e.DuracionMinutos, &fecha, &e.Imagen, &e.CreatedAt)
+	err := row.Scan(&e.ID, &e.SerieID, &e.Titulo, &e.Temporada, &e.NumeroEpisodio, &e.Descripcion, &e.DuracionMinutos, &fecha, &e.CreatedAt)
 	if err != nil {
 		return e, err
 	}

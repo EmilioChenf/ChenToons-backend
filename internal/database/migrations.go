@@ -33,7 +33,6 @@ func MigrarTablasChenin(db *pgxpool.Pool) error {
 			descripcion TEXT,
 			rol VARCHAR(80),
 			personalidad VARCHAR(120),
-			imagen TEXT,
 			created_at TIMESTAMP DEFAULT NOW()
 		);`,
 		`CREATE TABLE IF NOT EXISTS episodios (
@@ -45,7 +44,6 @@ func MigrarTablasChenin(db *pgxpool.Pool) error {
 			descripcion TEXT,
 			duracion_minutos INT,
 			fecha_estreno DATE,
-			imagen TEXT,
 			created_at TIMESTAMP DEFAULT NOW()
 		);`,
 		`CREATE TABLE IF NOT EXISTS ratings (
@@ -58,6 +56,16 @@ func MigrarTablasChenin(db *pgxpool.Pool) error {
 	}
 
 	for _, consulta := range consultas {
+		if _, err := db.Exec(context.Background(), consulta); err != nil {
+			return err
+		}
+	}
+
+	limpiezasChen := []string{
+		`ALTER TABLE personajes DROP COLUMN IF EXISTS imagen;`,
+		`ALTER TABLE episodios DROP COLUMN IF EXISTS imagen;`,
+	}
+	for _, consulta := range limpiezasChen {
 		if _, err := db.Exec(context.Background(), consulta); err != nil {
 			return err
 		}

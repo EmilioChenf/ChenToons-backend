@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,12 +15,12 @@ type serieSeedChen struct {
 }
 
 type personajeSeedChen struct {
-	nombre, descripcion, rol, personalidad, imagen string
+	nombre, descripcion, rol, personalidad string
 }
 
 type episodioSeedChen struct {
-	titulo, descripcion, fecha, imagen string
-	temporada, numero, duracion        int
+	titulo, descripcion, fecha  string
+	temporada, numero, duracion int
 }
 
 type ratingSeedChen struct {
@@ -106,9 +105,9 @@ func asegurarPersonajesChenin(db *pgxpool.Pool, serieID int, personajes []person
 		}
 
 		_, err = db.Exec(context.Background(), `INSERT INTO personajes
-			(serie_id, nombre, descripcion, rol, personalidad, imagen)
-			VALUES ($1,$2,$3,$4,$5,$6)`,
-			serieID, p.nombre, p.descripcion, p.rol, p.personalidad, p.imagen,
+			(serie_id, nombre, descripcion, rol, personalidad)
+			VALUES ($1,$2,$3,$4,$5)`,
+			serieID, p.nombre, p.descripcion, p.rol, p.personalidad,
 		)
 		if err != nil {
 			return err
@@ -131,9 +130,9 @@ func asegurarEpisodiosChenin(db *pgxpool.Pool, serieID int, episodios []episodio
 		}
 
 		_, err = db.Exec(context.Background(), `INSERT INTO episodios
-			(serie_id, titulo, temporada, numero_episodio, descripcion, duracion_minutos, fecha_estreno, imagen)
-			VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-			serieID, e.titulo, e.temporada, e.numero, e.descripcion, e.duracion, e.fecha, e.imagen,
+			(serie_id, titulo, temporada, numero_episodio, descripcion, duracion_minutos, fecha_estreno)
+			VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+			serieID, e.titulo, e.temporada, e.numero, e.descripcion, e.duracion, e.fecha,
 		)
 		if err != nil {
 			return err
@@ -193,10 +192,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 	datos := map[string]detalleSerieSeedChen{
 		"Pocoyo": {
 			personajes: []personajeSeedChen{
-				{"Pocoyo", "Nino curioso vestido de azul.", "Protagonista", "Curioso y alegre", "/uploads/pocoyo-personaje.jpg"},
-				{"Pato", "Amigo amarillo que intenta mantener el orden.", "Amigo", "Serio pero noble", "/uploads/pato.jpg"},
-				{"Elly", "Elefanta rosada que cuida a sus amigos.", "Amiga", "Dulce y paciente", "/uploads/elly.jpg"},
-				{"Loula", "Perrita fiel que acompana las aventuras.", "Mascota", "Juguetona", "/uploads/loula.jpg"},
+				{"Pocoyo", "Nino curioso vestido de azul.", "Protagonista", "Curioso y alegre"},
+				{"Pato", "Amigo amarillo que intenta mantener el orden.", "Amigo", "Serio pero noble"},
+				{"Elly", "Elefanta rosada que cuida a sus amigos.", "Amiga", "Dulce y paciente"},
+				{"Loula", "Perrita fiel que acompana las aventuras.", "Mascota", "Juguetona"},
 			},
 			episodios: episodiosChen("pocoyo", 2005, []string{
 				"El baile de Pocoyo", "La carrera de Pato", "El regalo de Elly", "Loula se esconde", "Musica en el parque", "La gran torre azul",
@@ -205,11 +204,11 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Escandalosos": {
 			personajes: []personajeSeedChen{
-				{"Pardo", "Oso grizzly que lidera muchas ideas del grupo.", "Protagonista", "Sociable", "/uploads/pardo.jpg"},
-				{"Panda", "Oso sensible que ama internet y el romance.", "Protagonista", "Timido", "/uploads/panda.jpg"},
-				{"Polar", "Oso callado con habilidades sorprendentes.", "Protagonista", "Misterioso", "/uploads/polar.jpg"},
-				{"Chloe", "Nina inteligente que se vuelve amiga de los osos.", "Amiga", "Aplicada", "/uploads/chloe.jpg"},
-				{"Nom Nom", "Koala famoso que complica varias situaciones.", "Rival", "Egocentrico", "/uploads/nom-nom.jpg"},
+				{"Pardo", "Oso grizzly que lidera muchas ideas del grupo.", "Protagonista", "Sociable"},
+				{"Panda", "Oso sensible que ama internet y el romance.", "Protagonista", "Timido"},
+				{"Polar", "Oso callado con habilidades sorprendentes.", "Protagonista", "Misterioso"},
+				{"Chloe", "Nina inteligente que se vuelve amiga de los osos.", "Amiga", "Aplicada"},
+				{"Nom Nom", "Koala famoso que complica varias situaciones.", "Rival", "Egocentrico"},
 			},
 			episodios: episodiosChen("escandalosos", 2015, []string{
 				"Nuestra cueva", "La selfie perfecta", "El dia de Chloe", "Polar cocina", "Panda en linea", "Nom Nom visita",
@@ -218,10 +217,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Snoopy y Charlie Brown": {
 			personajes: []personajeSeedChen{
-				{"Snoopy", "Beagle imaginativo que suena con ser piloto.", "Protagonista", "Creativo", "/uploads/snoopy-personaje.jpg"},
-				{"Charlie Brown", "Nino amable que nunca deja de intentarlo.", "Protagonista", "Tierno", "/uploads/charlie-brown.jpg"},
-				{"Lucy", "Amiga directa que siempre opina fuerte.", "Amiga", "Segura", "/uploads/lucy.jpg"},
-				{"Linus", "Nino tranquilo con su manta inseparable.", "Amigo", "Reflexivo", "/uploads/linus.jpg"},
+				{"Snoopy", "Beagle imaginativo que suena con ser piloto.", "Protagonista", "Creativo"},
+				{"Charlie Brown", "Nino amable que nunca deja de intentarlo.", "Protagonista", "Tierno"},
+				{"Lucy", "Amiga directa que siempre opina fuerte.", "Amiga", "Segura"},
+				{"Linus", "Nino tranquilo con su manta inseparable.", "Amigo", "Reflexivo"},
 			},
 			episodios: episodiosChen("snoopy", 1965, []string{
 				"Una pequena victoria", "La casita de Snoopy", "El partido de beisbol", "La manta de Linus", "Carta para el piloto", "El arbol de Navidad",
@@ -230,10 +229,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Bluey": {
 			personajes: []personajeSeedChen{
-				{"Bluey", "Cachorrita con energia para inventar juegos.", "Protagonista", "Imaginativa", "/uploads/bluey-personaje.jpg"},
-				{"Bingo", "Hermana menor que juega con mucha ternura.", "Protagonista", "Dulce", "/uploads/bingo.jpg"},
-				{"Bandit", "Papa de Bluey que se presta para todos los juegos.", "Padre", "Divertido", "/uploads/bandit.jpg"},
-				{"Chilli", "Mama tranquila que acompana los aprendizajes.", "Madre", "Paciente", "/uploads/chilli.jpg"},
+				{"Bluey", "Cachorrita con energia para inventar juegos.", "Protagonista", "Imaginativa"},
+				{"Bingo", "Hermana menor que juega con mucha ternura.", "Protagonista", "Dulce"},
+				{"Bandit", "Papa de Bluey que se presta para todos los juegos.", "Padre", "Divertido"},
+				{"Chilli", "Mama tranquila que acompana los aprendizajes.", "Madre", "Paciente"},
 			},
 			episodios: episodiosChen("bluey", 2018, []string{
 				"Magia de juegos", "El hospital de Bingo", "Carrera en el patio", "La tienda imaginaria", "Camping familiar", "La leccion de papa",
@@ -242,10 +241,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Peppa Pig": {
 			personajes: []personajeSeedChen{
-				{"Peppa", "Cerdita curiosa que disfruta jugar con su familia.", "Protagonista", "Alegre", "/uploads/peppa-personaje.jpg"},
-				{"George", "Hermano menor que ama los dinosaurios.", "Hermano", "Tierno", "/uploads/george.jpg"},
-				{"Mama Pig", "Mama paciente que guia a Peppa.", "Madre", "Amable", "/uploads/mama-pig.jpg"},
-				{"Papa Pig", "Papa bromista que siempre intenta ayudar.", "Padre", "Divertido", "/uploads/papa-pig.jpg"},
+				{"Peppa", "Cerdita curiosa que disfruta jugar con su familia.", "Protagonista", "Alegre"},
+				{"George", "Hermano menor que ama los dinosaurios.", "Hermano", "Tierno"},
+				{"Mama Pig", "Mama paciente que guia a Peppa.", "Madre", "Amable"},
+				{"Papa Pig", "Papa bromista que siempre intenta ayudar.", "Padre", "Divertido"},
 			},
 			episodios: episodiosChen("peppa", 2004, []string{
 				"Charcos de lodo", "El dinosaurio de George", "La visita de los abuelos", "Dia de escuela", "Picnic en familia", "El globo rojo",
@@ -254,11 +253,11 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Doraemon": {
 			personajes: []personajeSeedChen{
-				{"Doraemon", "Gato robot con bolsillo magico.", "Protagonista", "Leal", "/uploads/doraemon-personaje.jpg"},
-				{"Nobita", "Nino distraido que aprende con ayuda de Doraemon.", "Protagonista", "Sonador", "/uploads/nobita.jpg"},
-				{"Shizuka", "Amiga amable de Nobita.", "Amiga", "Inteligente", "/uploads/shizuka.jpg"},
-				{"Gigante", "Companero fuerte que suele intimidar.", "Companero", "Impulsivo", "/uploads/gigante.jpg"},
-				{"Suneo", "Nino presumido que crea conflictos.", "Companero", "Vanidoso", "/uploads/suneo.jpg"},
+				{"Doraemon", "Gato robot con bolsillo magico.", "Protagonista", "Leal"},
+				{"Nobita", "Nino distraido que aprende con ayuda de Doraemon.", "Protagonista", "Sonador"},
+				{"Shizuka", "Amiga amable de Nobita.", "Amiga", "Inteligente"},
+				{"Gigante", "Companero fuerte que suele intimidar.", "Companero", "Impulsivo"},
+				{"Suneo", "Nino presumido que crea conflictos.", "Companero", "Vanidoso"},
 			},
 			episodios: episodiosChen("doraemon", 1979, []string{
 				"El bolsillo magico", "La maquina del tiempo", "Nobita invisible", "El examen imposible", "El invento perdido", "Regreso al futuro",
@@ -267,10 +266,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Hora de Aventura": {
 			personajes: []personajeSeedChen{
-				{"Finn", "Heroe humano que busca aventuras en Ooo.", "Protagonista", "Valiente", "/uploads/finn.jpg"},
-				{"Jake", "Perro magico que cambia de forma.", "Protagonista", "Relajado", "/uploads/jake.jpg"},
-				{"Dulce Princesa", "Gobernante inteligente del Dulce Reino.", "Aliada", "Analitica", "/uploads/dulce-princesa.jpg"},
-				{"Marceline", "Vampira musica con historia misteriosa.", "Aliada", "Libre", "/uploads/marceline.jpg"},
+				{"Finn", "Heroe humano que busca aventuras en Ooo.", "Protagonista", "Valiente"},
+				{"Jake", "Perro magico que cambia de forma.", "Protagonista", "Relajado"},
+				{"Dulce Princesa", "Gobernante inteligente del Dulce Reino.", "Aliada", "Analitica"},
+				{"Marceline", "Vampira musica con historia misteriosa.", "Aliada", "Libre"},
 			},
 			episodios: episodiosChen("hora-aventura", 2010, []string{
 				"El heroe de Ooo", "La espada perdida", "Dulce Reino en peligro", "Cancion de Marceline", "Jake se estira", "Mazmorra de amigos",
@@ -279,10 +278,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"El Laboratorio de Dexter": {
 			personajes: []personajeSeedChen{
-				{"Dexter", "Nino cientifico con laboratorio secreto.", "Protagonista", "Genial y terco", "/uploads/dexter-personaje.jpg"},
-				{"Dee Dee", "Hermana que entra al laboratorio sin permiso.", "Hermana", "Traviesa", "/uploads/dee-dee.jpg"},
-				{"Mandark", "Rival cientifico de Dexter.", "Rival", "Presumido", "/uploads/mandark.jpg"},
-				{"Mama", "Mama de Dexter que mantiene la casa en orden.", "Familia", "Protectora", "/uploads/mama-dexter.jpg"},
+				{"Dexter", "Nino cientifico con laboratorio secreto.", "Protagonista", "Genial y terco"},
+				{"Dee Dee", "Hermana que entra al laboratorio sin permiso.", "Hermana", "Traviesa"},
+				{"Mandark", "Rival cientifico de Dexter.", "Rival", "Presumido"},
+				{"Mama", "Mama de Dexter que mantiene la casa en orden.", "Familia", "Protectora"},
 			},
 			episodios: episodiosChen("dexter", 1996, []string{
 				"El laboratorio secreto", "Dee Dee toca botones", "Mandark reta a Dexter", "Robot fuera de control", "Formula para crecer", "Experimento en casa",
@@ -291,10 +290,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Las Chicas Superpoderosas": {
 			personajes: []personajeSeedChen{
-				{"Bombon", "Lider del equipo y estratega.", "Heroina", "Responsable", "/uploads/bombon.jpg"},
-				{"Burbuja", "Heroina tierna con gran sensibilidad.", "Heroina", "Dulce", "/uploads/burbuja.jpg"},
-				{"Bellota", "Heroina fuerte que enfrenta el peligro directo.", "Heroina", "Valiente", "/uploads/bellota.jpg"},
-				{"Mojo Jojo", "Villano que siempre prepara planes complicados.", "Villano", "Dramatico", "/uploads/mojo-jojo.jpg"},
+				{"Bombon", "Lider del equipo y estratega.", "Heroina", "Responsable"},
+				{"Burbuja", "Heroina tierna con gran sensibilidad.", "Heroina", "Dulce"},
+				{"Bellota", "Heroina fuerte que enfrenta el peligro directo.", "Heroina", "Valiente"},
+				{"Mojo Jojo", "Villano que siempre prepara planes complicados.", "Villano", "Dramatico"},
 			},
 			episodios: episodiosChen("chicas-superpoderosas", 1998, []string{
 				"Salvando Saltadilla", "El plan de Mojo", "Burbuja al rescate", "Bellota no se rinde", "Bombon lidera", "Dia de escuela heroico",
@@ -303,10 +302,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Tom y Jerry": {
 			personajes: []personajeSeedChen{
-				{"Tom", "Gato que siempre intenta atrapar a Jerry.", "Protagonista", "Insistente", "/uploads/tom.jpg"},
-				{"Jerry", "Raton astuto que se escapa con ingenio.", "Protagonista", "Listo", "/uploads/jerry.jpg"},
-				{"Spike", "Perro fuerte que protege su tranquilidad.", "Secundario", "Gruñon", "/uploads/spike.jpg"},
-				{"Tyke", "Cachorro pequeno que acompana a Spike.", "Secundario", "Inocente", "/uploads/tyke.jpg"},
+				{"Tom", "Gato que siempre intenta atrapar a Jerry.", "Protagonista", "Insistente"},
+				{"Jerry", "Raton astuto que se escapa con ingenio.", "Protagonista", "Listo"},
+				{"Spike", "Perro fuerte que protege su tranquilidad.", "Secundario", "Gruñon"},
+				{"Tyke", "Cachorro pequeno que acompana a Spike.", "Secundario", "Inocente"},
 			},
 			episodios: episodiosChen("tom-jerry", 1940, []string{
 				"La persecucion", "Jerry en la cocina", "Tom pianista", "Spike se enoja", "El queso perdido", "Noche en la casa",
@@ -315,10 +314,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Masha y el Oso": {
 			personajes: []personajeSeedChen{
-				{"Masha", "Nina inquieta que siempre visita al Oso.", "Protagonista", "Traviesa", "/uploads/masha-personaje.jpg"},
-				{"Oso", "Oso tranquilo que cuida su casa.", "Protagonista", "Paciente", "/uploads/oso.jpg"},
-				{"Osa", "Vecina que llama la atencion del Oso.", "Secundaria", "Elegante", "/uploads/osa.jpg"},
-				{"Liebre", "Amigo del bosque que suele quedar atrapado en juegos.", "Amigo", "Nervioso", "/uploads/liebre.jpg"},
+				{"Masha", "Nina inquieta que siempre visita al Oso.", "Protagonista", "Traviesa"},
+				{"Oso", "Oso tranquilo que cuida su casa.", "Protagonista", "Paciente"},
+				{"Osa", "Vecina que llama la atencion del Oso.", "Secundaria", "Elegante"},
+				{"Liebre", "Amigo del bosque que suele quedar atrapado en juegos.", "Amigo", "Nervioso"},
 			},
 			episodios: episodiosChen("masha", 2009, []string{
 				"Visita inesperada", "La receta de Masha", "Oso quiere dormir", "Juego en el bosque", "Fiesta de invierno", "El cuadro arruinado",
@@ -327,10 +326,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Craig del Arroyo": {
 			personajes: []personajeSeedChen{
-				{"Craig", "Nino explorador que dibuja mapas del arroyo.", "Protagonista", "Curioso", "/uploads/craig-personaje.jpg"},
-				{"Kelsey", "Amiga aventurera que imagina misiones epicas.", "Amiga", "Valiente", "/uploads/kelsey.jpg"},
-				{"JP", "Amigo noble que acompana cualquier plan.", "Amigo", "Relajado", "/uploads/jp.jpg"},
-				{"Jessica", "Hermana menor de Craig.", "Familia", "Inteligente", "/uploads/jessica.jpg"},
+				{"Craig", "Nino explorador que dibuja mapas del arroyo.", "Protagonista", "Curioso"},
+				{"Kelsey", "Amiga aventurera que imagina misiones epicas.", "Amiga", "Valiente"},
+				{"JP", "Amigo noble que acompana cualquier plan.", "Amigo", "Relajado"},
+				{"Jessica", "Hermana menor de Craig.", "Familia", "Inteligente"},
 			},
 			episodios: episodiosChen("craig", 2018, []string{
 				"El mapa del arroyo", "La aventura secreta", "El fuerte perdido", "Carrera entre amigos", "Misterio en el bosque", "La reunion del puente",
@@ -339,11 +338,11 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Gravity Falls": {
 			personajes: []personajeSeedChen{
-				{"Dipper Pines", "Nino curioso que investiga misterios.", "Protagonista", "Analitico", "/uploads/dipper.jpg"},
-				{"Mabel Pines", "Hermana alegre con sueteres inolvidables.", "Protagonista", "Optimista", "/uploads/mabel.jpg"},
-				{"Stan Pines", "Tio de los gemelos y dueno de la cabana.", "Familia", "Astuto", "/uploads/stan.jpg"},
-				{"Soos", "Empleado amable que ayuda en la cabana.", "Amigo", "Leal", "/uploads/soos.jpg"},
-				{"Wendy", "Amiga tranquila que trabaja con Stan.", "Amiga", "Relajada", "/uploads/wendy.jpg"},
+				{"Dipper Pines", "Nino curioso que investiga misterios.", "Protagonista", "Analitico"},
+				{"Mabel Pines", "Hermana alegre con sueteres inolvidables.", "Protagonista", "Optimista"},
+				{"Stan Pines", "Tio de los gemelos y dueno de la cabana.", "Familia", "Astuto"},
+				{"Soos", "Empleado amable que ayuda en la cabana.", "Amigo", "Leal"},
+				{"Wendy", "Amiga tranquila que trabaja con Stan.", "Amiga", "Relajada"},
 			},
 			episodios: episodiosChen("gravity-falls", 2012, []string{
 				"Trampa turistica", "El diario numero tres", "Mabel gana un cerdo", "Misterio en el lago", "La tienda encantada", "El secreto de la cabana",
@@ -352,10 +351,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Steven Universe": {
 			personajes: []personajeSeedChen{
-				{"Steven", "Nino con poderes de gema y mucho corazon.", "Protagonista", "Empatico", "/uploads/steven-personaje.jpg"},
-				{"Garnet", "Gema fuerte y tranquila que guia al grupo.", "Mentora", "Serena", "/uploads/garnet.jpg"},
-				{"Amatista", "Gema libre que disfruta la diversion.", "Aliada", "Espontanea", "/uploads/amatista.jpg"},
-				{"Perla", "Gema elegante y cuidadosa.", "Aliada", "Ordenada", "/uploads/perla.jpg"},
+				{"Steven", "Nino con poderes de gema y mucho corazon.", "Protagonista", "Empatico"},
+				{"Garnet", "Gema fuerte y tranquila que guia al grupo.", "Mentora", "Serena"},
+				{"Amatista", "Gema libre que disfruta la diversion.", "Aliada", "Espontanea"},
+				{"Perla", "Gema elegante y cuidadosa.", "Aliada", "Ordenada"},
 			},
 			episodios: episodiosChen("steven", 2013, []string{
 				"El brillo de Steven", "Garnet decide", "La espada de Perla", "Amatista se transforma", "Cancion en la playa", "La burbuja magica",
@@ -364,10 +363,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Oggy y las Cucarachas": {
 			personajes: []personajeSeedChen{
-				{"Oggy", "Gato azul que intenta vivir tranquilo.", "Protagonista", "Paciente", "/uploads/oggy-personaje.jpg"},
-				{"Joey", "Cucaracha pequena que lidera los planes.", "Antagonista", "Mandona", "/uploads/joey.jpg"},
-				{"Dee Dee", "Cucaracha glotona que causa desorden.", "Antagonista", "Hambrienta", "/uploads/dee-dee-cucaracha.jpg"},
-				{"Marky", "Cucaracha relajada que sigue el caos.", "Antagonista", "Despreocupada", "/uploads/marky.jpg"},
+				{"Oggy", "Gato azul que intenta vivir tranquilo.", "Protagonista", "Paciente"},
+				{"Joey", "Cucaracha pequena que lidera los planes.", "Antagonista", "Mandona"},
+				{"Dee Dee", "Cucaracha glotona que causa desorden.", "Antagonista", "Hambrienta"},
+				{"Marky", "Cucaracha relajada que sigue el caos.", "Antagonista", "Despreocupada"},
 			},
 			episodios: episodiosChen("oggy", 1998, []string{
 				"El refrigerador abierto", "Cucarachas al ataque", "Oggy limpia la casa", "La pizza perdida", "Noche de television", "El jardin invadido",
@@ -376,11 +375,11 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Los Rugrats": {
 			personajes: []personajeSeedChen{
-				{"Tommy", "Bebe lider que imagina grandes aventuras.", "Protagonista", "Valiente", "/uploads/tommy.jpg"},
-				{"Chuckie", "Amigo miedoso pero muy leal.", "Amigo", "Nervioso", "/uploads/chuckie.jpg"},
-				{"Angelica", "Prima mayor que suele mandar al grupo.", "Prima", "Mandona", "/uploads/angelica.jpg"},
-				{"Phil", "Bebe que acompana travesuras con su hermana.", "Amigo", "Jugueton", "/uploads/phil.jpg"},
-				{"Lil", "Hermana de Phil y companera de aventuras.", "Amiga", "Curiosa", "/uploads/lil.jpg"},
+				{"Tommy", "Bebe lider que imagina grandes aventuras.", "Protagonista", "Valiente"},
+				{"Chuckie", "Amigo miedoso pero muy leal.", "Amigo", "Nervioso"},
+				{"Angelica", "Prima mayor que suele mandar al grupo.", "Prima", "Mandona"},
+				{"Phil", "Bebe que acompana travesuras con su hermana.", "Amigo", "Jugueton"},
+				{"Lil", "Hermana de Phil y companera de aventuras.", "Amiga", "Curiosa"},
 			},
 			episodios: episodiosChen("rugrats", 1991, []string{
 				"Aventura en la sala", "El juguete perdido", "Angelica manda", "Chuckie se anima", "Phil y Lil exploran", "Dia en el parque",
@@ -389,10 +388,10 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"Hey Arnold!": {
 			personajes: []personajeSeedChen{
-				{"Arnold", "Nino amable que vive historias de barrio.", "Protagonista", "Solidario", "/uploads/arnold.jpg"},
-				{"Gerald", "Mejor amigo de Arnold y gran narrador.", "Amigo", "Seguro", "/uploads/gerald.jpg"},
-				{"Helga", "Companera intensa que oculta sus sentimientos.", "Companera", "Fuerte", "/uploads/helga.jpg"},
-				{"Abuelo Phil", "Abuelo de Arnold que cuenta historias raras.", "Familia", "Divertido", "/uploads/abuelo-phil.jpg"},
+				{"Arnold", "Nino amable que vive historias de barrio.", "Protagonista", "Solidario"},
+				{"Gerald", "Mejor amigo de Arnold y gran narrador.", "Amigo", "Seguro"},
+				{"Helga", "Companera intensa que oculta sus sentimientos.", "Companera", "Fuerte"},
+				{"Abuelo Phil", "Abuelo de Arnold que cuenta historias raras.", "Familia", "Divertido"},
 			},
 			episodios: episodiosChen("hey-arnold", 1996, []string{
 				"El barrio despierta", "Gerald cuenta una historia", "El secreto de Helga", "Partido en la calle", "La pension de los abuelos", "Arnold ayuda a un amigo",
@@ -401,11 +400,11 @@ func detallesToonChenin() map[string]detalleSerieSeedChen {
 		},
 		"El Increible Mundo de Gumball": {
 			personajes: []personajeSeedChen{
-				{"Gumball", "Gato azul que vive problemas absurdos.", "Protagonista", "Impulsivo", "/uploads/gumball-personaje.jpg"},
-				{"Darwin", "Hermano y mejor amigo de Gumball.", "Protagonista", "Noble", "/uploads/darwin.jpg"},
-				{"Anais", "Hermana menor muy inteligente.", "Familia", "Lista", "/uploads/anais.jpg"},
-				{"Nicole", "Mama de la familia Watterson.", "Madre", "Fuerte", "/uploads/nicole.jpg"},
-				{"Richard", "Papa torpe pero carinoso.", "Padre", "Despistado", "/uploads/richard.jpg"},
+				{"Gumball", "Gato azul que vive problemas absurdos.", "Protagonista", "Impulsivo"},
+				{"Darwin", "Hermano y mejor amigo de Gumball.", "Protagonista", "Noble"},
+				{"Anais", "Hermana menor muy inteligente.", "Familia", "Lista"},
+				{"Nicole", "Mama de la familia Watterson.", "Madre", "Fuerte"},
+				{"Richard", "Papa torpe pero carinoso.", "Padre", "Despistado"},
 			},
 			episodios: episodiosChen("gumball", 2011, []string{
 				"El DVD", "La deuda", "El tercero", "La pintura", "El club", "La consola perdida",
@@ -427,7 +426,6 @@ func episodiosChen(slug string, anio int, titulos []string) []episodioSeedChen {
 			descripcion: descripcionEpisodioToon(titulo),
 			duracion:    duracionToonChen(slug),
 			fecha:       fechaToonChen(anio, i),
-			imagen:      "/uploads/ep-" + slug + "-" + slugTituloChen(titulo) + ".jpg",
 		})
 	}
 	return episodios
@@ -465,14 +463,4 @@ func fechaToonChen(anio int, indice int) string {
 		mes = 12
 	}
 	return fmt.Sprintf("%04d-%02d-%02d", anio, mes, 5+indice)
-}
-
-func slugTituloChen(titulo string) string {
-	reemplazos := strings.NewReplacer(
-		"!", "", ".", "", ",", "", ":", "", "?", "",
-		"á", "a", "é", "e", "í", "i", "ó", "o", "ú", "u",
-		"Á", "a", "É", "e", "Í", "i", "Ó", "o", "Ú", "u",
-		"ñ", "n", "Ñ", "n",
-	)
-	return strings.ReplaceAll(strings.ToLower(reemplazos.Replace(titulo)), " ", "-")
 }

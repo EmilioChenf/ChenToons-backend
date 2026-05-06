@@ -11,6 +11,5 @@ type Episodio struct {
 	Descripcion     string    `json:"descripcion"`
 	DuracionMinutos int       `json:"duracion_minutos"`
 	FechaEstreno    string    `json:"fecha_estreno"`
-	Imagen          string    `json:"imagen"`
 	CreatedAt       time.Time `json:"created_at"`
 }
