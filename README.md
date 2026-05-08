@@ -219,7 +219,7 @@ Notas para Render:
 
 ## Screenshot
 
-![ChenToons Backend](screenshots/backend.png)
+![](image.png)
 
 > Pendiente agregar captura real de Swagger o de una respuesta de la API.
 
