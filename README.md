@@ -149,7 +149,7 @@ docs/openapi.yaml
 En Render sera la misma ruta con el dominio publicado:
 
 ```text
-https://TU-BACKEND-RENDER.onrender.com/swagger/index.html
+https://cheentoons-backend.onrender.com/swagger/index.html
 ```
 
 ## CORS
@@ -221,7 +221,6 @@ Notas para Render:
 
 ![](image.png)
 
-> Pendiente agregar captura real de Swagger o de una respuesta de la API.
 
 ## Reflexion
 
